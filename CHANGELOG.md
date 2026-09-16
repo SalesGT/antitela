@@ -17,4 +17,9 @@ Todas as modificações relevantes e entregas do projeto AntiTela serão documen
 - Documento de personas em `docs/personas.md`, com as duas personas principais do projeto (Lucas, adolescente e usuário primário, e Julia, mãe e usuária secundária) e a justificativa da persona prioritária.
 - Referências bibliográficas completas adicionadas ao final de `docs/pesquisa.md`, com autor, título, ano e link de acesso de cada fonte.
 
+## [16/09/2026]
 
+### Adicionado
+- Documento formal de Engenharia de Requisitos em `docs/requisitos.md`, cobrindo 8 funcionalidades detalhadas, 12 Requisitos Funcionais (RF), 6 Requisitos Não Funcionais (RNF), mapeamento CRUD e matriz de priorização.
+- Mapeamento e especificação das telas/fluxos do Protótipo Interativo (React/JSX) para demonstração de regras de negócio, avatar e diário de humor.
+- Atualização do `README.md` com os novos links de documentação (`requisitos.md` e `apresentacaoRequisitos.pdf`) e atualização das responsabilidades dos integrantes.
