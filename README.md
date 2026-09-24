@@ -43,4 +43,14 @@ O **AntiTela** é um aplicativo mobile desenvolvido em Flutter que substitui mod
 ├── CHANGELOG.md            <- Histórico de versões e alterações
 └── docs/
     └── estudo-de-caso.md   <- Análise crítica detalhada do estudo de caso (Seções 2.1 a 2.8)
-```
+
+---
+
+## 🎨 UI/UX e Prototipação (Atividade 4)
+
+A interface do AntiTela foi desenvolvida com foco na simplicidade, bem-estar digital e gamificação. 
+
+* **Protótipo de Baixa Fidelidade:** Focado na estrutura, navegação base (Avatar, Metas, Foco, Diário) e fluxo de ecrãs.
+* **Protótipo de Alta Fidelidade (Figma):** Apresenta a identidade visual completa, componentes e acessibilidade. [Aceder ao Figma (Alta Fidelidade)](https://neat-sax-81769526.figma.site/)
+
+Os documentos em formato PDF com os ecrãs detalhados e as **Justificativas de UI/UX** encontram-se na pasta `docs/`.
