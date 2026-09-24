@@ -23,3 +23,10 @@ Todas as modificações relevantes e entregas do projeto AntiTela serão documen
 - Documento formal de Engenharia de Requisitos em `docs/requisitos.md`, cobrindo 8 funcionalidades detalhadas, 12 Requisitos Funcionais (RF), 6 Requisitos Não Funcionais (RNF), mapeamento CRUD e matriz de priorização.
 - Mapeamento e especificação das telas/fluxos do Protótipo Interativo (React/JSX) para demonstração de regras de negócio, avatar e diário de humor.
 - Atualização do `README.md` com os novos links de documentação (`requisitos.md` e `apresentacaoRequisitos.pdf`) e atualização das responsabilidades dos integrantes.
+
+- ## [0.4.0] - 2026-09-23
+### Adicionado
+- Criação dos protótipos de baixa fidelidade (Wireframes estruturais).
+- Desenvolvimento do protótipo de alta fidelidade no Figma.
+- Adição do documento `justificativas.md` detalhando as decisões de UI, UX, Acessibilidade e Arquitetura.
+- Atualização da documentação no repositório para a Atividade 04.
