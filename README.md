@@ -1,18 +1,32 @@
-AntiTela — Regulação Saudável do Tempo de Tela para Adolescentes
+# AntiTela — Regulação Saudável do Tempo de Tela para Adolescentes
+
 Projeto acadêmico focado em promover a saúde digital, a higiene do sono e a autorregulação juvenil através de gamificação e empatia virtual, sem vigilância invasiva.
-📌 Informações Gerais
- * Nome do Projeto: AntiTela
- * Turma: PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS - GP0015NOT07A
- * Repositório: SalesGT/antitela
- * Integrantes do Grupo:
-   * João Gabriel da Costa Souza
-   * Luka Goes Ribeiro
-   * Nycolas Davi Gomes Ribeiro
-   * Samy Rocha Guilherme dos Santos
-   * Tiago Sales Guimarães
-📝 Breve Descrição do Projeto
-O AntiTela é um aplicativo mobile desenvolvido em Flutter que substitui modelos punitivos de controle parental por uma abordagem de autocuidado gamificada. Centrado na figura de um Avatar Âncora que adoece com o excesso de uso do smartphone e se recupera com atividades no mundo real, o app oferece um cronômetro de foco com silenciamento nativo de notificações (Não Perturbe do Android), missões offline e um diário de humor pós-tela estritamente privado. A prestação de contas com os responsáveis ocorre de forma transparente por meio de relatórios consolidados em PDF exportados periodicamente, fortalecendo a confiança familiar.
-📁 Estrutura do Repositório
+
+---
+
+## 📌 Informações Gerais
+
+* **Nome do Projeto:** AntiTela
+* **Turma:** PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS - GP0015NOT07A
+* **Repositório:** [SalesGT/antitela](https://github.com/SalesGT/antitela)
+* **Integrantes do Grupo:**
+  * João Gabriel da Costa Souza
+  * Luka Goes Ribeiro
+  * Nycolas Davi Gomes Ribeiro
+  * Samy Rocha Guilherme dos Santos
+  * Tiago Sales Guimarães
+
+---
+
+## 📝 Breve Descrição do Projeto
+
+O **AntiTela** é um aplicativo mobile desenvolvido em **Flutter** que substitui modelos punitivos de controle parental por uma abordagem de autocuidado gamificada. Centrado na figura de um Avatar Âncora que adoece com o excesso de uso do smartphone e se recupera com atividades no mundo real, o app oferece um cronômetro de foco com silenciamento nativo de notificações (*Não Perturbe* do Android), missões offline e um diário de humor pós-tela estritamente privado. A prestação de contas com os responsáveis ocorre de forma transparente por meio de relatórios consolidados em PDF exportados periodicamente, fortalecendo a confiança familiar.
+
+---
+
+## 📁 Estrutura do Repositório
+
+```text
 .
 ├── README.md                          <- Identificação da equipe, escopo e navegação geral
 ├── CHANGELOG.md                       <- Histórico de versões e alterações do repositório
@@ -58,3 +72,5 @@ Para testar a experiência visual e a navegação do projeto:
  * Acesse o link público do Figma do AntiTela.
  * Utilize o menu inferior de navegação para alternar entre os ecrãs de Avatar, Modo Foco, Missões Offline e Diário.
  * Na aba de Modo Foco, selecione um tempo pré-definido (25, 45 ou 60 minutos) e clique em "Iniciar Modo Foco" para simular o acionamento do temporizador em até 3 toques.
+
+   
