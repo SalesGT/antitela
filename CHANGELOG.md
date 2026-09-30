@@ -24,16 +24,22 @@ Todas as modificações relevantes e entregas do projeto AntiTela serão documen
 - Mapeamento e especificação das telas/fluxos do Protótipo Interativo (React/JSX) para demonstração de regras de negócio, avatar e diário de humor.
 - Atualização do `README.md` com os novos links de documentação (`requisitos.md` e `apresentacaoRequisitos.pdf`) e atualização das responsabilidades dos integrantes.
 
-## [0.4.0] - 2026-09-23
+## [0.4.0] - [23/09/2026]
+
 ### Adicionado
-- Criação dos protótipos de baixa fidelidade (Wireframes estruturais).
-- Desenvolvimento do protótipo de alta fidelidade no Figma.
-- Adição do documento `justificativas.md` detalhando as decisões de UI, UX, Acessibilidade e Arquitetura.
+- Criação dos protótipos de baixa fidelidade (Wireframes estruturais em `docs/prototipoBaixaFidelidade.pdf`).
+- Desenvolvimento do protótipo de alta fidelidade no Figma (`docs/prototipoAltaFidelidade.pdf`).
+- Adição do documento `docs/justificativas.md` detalhando as decisões de UI, UX, Acessibilidade e Arquitetura.
 - Atualização da documentação no repositório para a Atividade 04.
 
-## [0.5.0] - 2026-09-30
+## [0.5.0] - [30/09/2026]
+
 ### Adicionado
-- Apresentação final em `docs/apresentacaoFinalUnidadeI.pdf` (problema, personas, funcionalidades, protótipos de baixa e alta fidelidade, cores, fluxo e arquitetura).
+- Apresentação final da Unidade I em `docs/apresentacaoFinalUnidadeI.pdf` (cobrindo problema, personas, funcionalidades, protótipos, cores, fluxo e arquitetura).
+- Inclusão do documento `docs/apresentacaoRequisitos.pdf` referente à Atividade 03.
+- Atalho direto para o protótipo navegável do Figma em `docs/LinkPrototipoAltaFidelidade`.
+
 ### Alterado
-- README com a estrutura completa do repositório e as responsabilidades por atividade.
-- Correções de consistência em `pesquisa.md`, `personas.md`, `requisitos.md` e `justificativas.md`.
+- Padronização e renomeação dos arquivos em `docs/` para remoção de acentos e espaços (ex.: `apresentacaoFinalUnidadeI.pdf` e `prototipoAltaFidelidade.pdf`).
+- Atualização do `README.md` com a estrutura completa do repositório, mapa de entregas e distribuição de responsabilidades por atividade.
+- Correções de consistência e alinhamento visual nos documentos `pesquisa.md`, `personas.md`, `requisitos.md` e `justificativas.md`.
