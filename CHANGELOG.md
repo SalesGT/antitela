@@ -30,3 +30,10 @@ Todas as modificações relevantes e entregas do projeto AntiTela serão documen
 - Desenvolvimento do protótipo de alta fidelidade no Figma.
 - Adição do documento `justificativas.md` detalhando as decisões de UI, UX, Acessibilidade e Arquitetura.
 - Atualização da documentação no repositório para a Atividade 04.
+
+## [0.5.0] - 2026-09-30
+### Adicionado
+- Apresentação final em `docs/apresentacaoFinalUnidadeI.pdf` (problema, personas, funcionalidades, protótipos de baixa e alta fidelidade, cores, fluxo e arquitetura).
+### Alterado
+- README com a estrutura completa do repositório e as responsabilidades por atividade.
+- Correções de consistência em `pesquisa.md`, `personas.md`, `requisitos.md` e `justificativas.md`.
