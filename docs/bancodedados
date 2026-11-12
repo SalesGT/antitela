@@ -1,0 +1,58 @@
+
+
+Table usuarios {
+  id varchar [pk]
+  nome varchar [not null]
+  tipo varchar [not null] 
+  criado_em timestamp
+}
+
+
+Table avatares {
+  id varchar [pk]
+  usuario_id varchar [ref: - usuarios.id, unique, not null] 
+  nome_mascote varchar [not null] 
+  status_humor varchar [not null] 
+  dias_protegidos integer [default: 0]
+  escudos integer [default: 0]
+}
+
+Table sessoes_foco {
+  id varchar [pk]
+  usuario_id varchar [ref: > usuarios.id, not null]
+  duracao_minutos integer [not null] 
+  tipo_ciclo varchar [not null] 
+  horario_inicio timestamp [not null]
+  concluida boolean [not null]
+}
+
+Table missoes_offline {
+  id varchar [pk]
+  usuario_id varchar [ref: > usuarios.id, not null]
+  titulo varchar [not null] 
+  recompensa_bonus integer [not null]
+  concluida boolean [default: false]
+}
+
+Table registros_diario {
+  id varchar [pk]
+  usuario_id varchar [ref: > usuarios.id, not null]
+  timestamp timestamp [not null]
+  bateria_mental varchar [not null] 
+  desabafo_privado text 
+}
+
+Table tags_contexto {
+  id varchar [pk]
+  nome varchar [unique, not null] 
+}
+
+
+Table registro_tags {
+  registro_id varchar [ref: > registros_diario.id]
+  tag_id varchar [ref: > tags_contexto.id]
+  
+  indexes {
+    (registro_id, tag_id) [pk] 
+      }
+}  
