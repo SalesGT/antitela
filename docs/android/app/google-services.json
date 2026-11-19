@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "113453046028",
+    "project_id": "antitela-51de2",
+    "storage_bucket": "antitela-51de2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113453046028:android:df3162fb9264c06428d129",
+        "android_client_info": {
+          "package_name": "com.example.antitela"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLrvGlhjECZiBiP1EmjF7kbKxDGQAyDNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

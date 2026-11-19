@@ -1,5 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../main.dart';
+import '../data/antitela_repository.dart';
+import '../models/missao_offline.dart';
+import '../services/relatorio_pdf_service.dart';
 
 class MissoesScreen extends StatefulWidget {
   const MissoesScreen({super.key});
@@ -10,30 +14,83 @@ class MissoesScreen extends StatefulWidget {
 
 class _MissoesScreenState extends State<MissoesScreen> {
   final TextEditingController _controller = TextEditingController();
-  final List<_Mission> _missions = [
-    _Mission(id: 1, text: 'Arrumar a cama ao acordar'),
-    _Mission(id: 2, text: 'Ler 1 capítulo de um livro'),
-    _Mission(id: 3, text: 'Caminhar com o cão ao ar livre'),
-    _Mission(id: 4, text: 'Jantar sem telemóvel na mesa', done: true),
-    _Mission(id: 5, text: 'Organizar o quarto / secretária'),
-    _Mission(id: 6, text: 'Conversar 15min com alguém da família'),
-  ];
+  final AntiTelaRepository _repo = AntiTelaRepository();
+  final List<_Mission> _missions = [];
+  StreamSubscription<List<MissaoOffline>>? _sub;
+  bool _exportandoPdf = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Lista vem do Firestore (funciona offline e atualiza sozinha).
+    try {
+      _sub = _repo.missoes().listen((lista) {
+        if (!mounted) return;
+        setState(() {
+          _missions
+            ..clear()
+            ..addAll(lista.map((m) => _Mission(
+                id: m.id,
+                text: m.titulo,
+                bonus: m.recompensaBonus,
+                done: m.concluida)));
+        });
+      }, onError: (Object e) => debugPrint('Erro ao ler missões: $e'));
+    } catch (e) {
+      debugPrint('Banco indisponível: $e');
+    }
+  }
 
   int get _done => _missions.where((m) => m.done).length;
   double get _progress => _missions.isEmpty ? 0 : _done / _missions.length;
 
-  void _addMission() {
+  Future<void> _addMission() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
-    setState(() {
-      _missions
-          .add(_Mission(id: DateTime.now().millisecondsSinceEpoch, text: text));
-      _controller.clear();
-    });
+    _controller.clear();
+    try {
+      await _repo.criarMissao(titulo: text, recompensaBonus: 1);
+    } catch (e) {
+      debugPrint('Erro ao criar missão: $e');
+    }
+  }
+
+  // Concluir credita escudos no avatar (RF05). Missão concluída não volta atrás.
+  Future<void> _toggle(_Mission m) async {
+    if (m.done) return;
+    try {
+      await _repo.concluirMissao(MissaoOffline(
+          id: m.id, titulo: m.text, recompensaBonus: m.bonus, concluida: false));
+    } catch (e) {
+      debugPrint('Erro ao concluir missão: $e');
+    }
+  }
+
+  Future<void> _remove(_Mission m) async {
+    try {
+      await _repo.apagarMissao(m.id);
+    } catch (e) {
+      debugPrint('Erro ao apagar missão: $e');
+    }
+  }
+
+  Future<void> _exportarPdf() async {
+    setState(() => _exportandoPdf = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await RelatorioPdfService(repository: _repo).exportarSemanal();
+    } catch (e) {
+      debugPrint('Erro ao gerar PDF: $e');
+      messenger.showSnackBar(const SnackBar(
+          content: Text('Não foi possível gerar o PDF agora.')));
+    } finally {
+      if (mounted) setState(() => _exportandoPdf = false);
+    }
   }
 
   @override
   void dispose() {
+    _sub?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -47,6 +104,16 @@ class _MissoesScreenState extends State<MissoesScreen> {
           children: [
             AppHeader(
               streak: '$_done/${_missions.length}',
+              actions: [
+                IconButton(
+                  onPressed: _exportandoPdf ? null : _exportarPdf,
+                  tooltip: 'Salvar relatório em PDF',
+                  icon: const Icon(Icons.picture_as_pdf_outlined,
+                      color: AppColors.textMuted, size: 20),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -190,9 +257,8 @@ class _MissoesScreenState extends State<MissoesScreen> {
               _missions.length,
               (i) => _MissionTile(
                     mission: _missions[i],
-                    onToggle: () =>
-                        setState(() => _missions[i].done = !_missions[i].done),
-                    onDelete: () => setState(() => _missions.removeAt(i)),
+                    onToggle: () => _toggle(_missions[i]),
+                    onDelete: () => _remove(_missions[i]),
                   )),
         ],
       ),
@@ -238,10 +304,15 @@ class _MissoesScreenState extends State<MissoesScreen> {
 }
 
 class _Mission {
-  final int id;
+  final String id;
   final String text;
+  final int bonus;
   bool done;
-  _Mission({required this.id, required this.text, this.done = false});
+  _Mission(
+      {required this.id,
+      required this.text,
+      this.bonus = 1,
+      this.done = false});
 }
 
 class _MissionTile extends StatelessWidget {
@@ -307,10 +378,11 @@ class _MissionTile extends StatelessWidget {
                       fontWeight: FontWeight.w600)),
             )
           else
-            const Padding(
-              padding: EdgeInsets.only(right: 8),
-              child: Text('+1',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Text('+${mission.bonus}',
+                  style: const TextStyle(
+                      color: AppColors.textMuted, fontSize: 13)),
             ),
           GestureDetector(
             onTap: onDelete,

@@ -67,7 +67,7 @@
 
 * **RNF01 — Usabilidade:** O usuário deve conseguir acessar a funcionalidade principal (Modo Foco) em, no máximo, três interações a partir do acesso ao app.
 * **RNF02 — Desempenho e Consumo:** O aplicativo deve rodar de forma estável em dispositivos Android com 2GB de memória RAM, mantendo o consumo de CPU em segundo plano abaixo de 5%.
-* **RNF03 — Segurança e Privacidade (LGPD):** O sistema deve armazenar os registros do Diário de Humor estritamente no banco de dados local (`SQLite`), sem envio de dados pessoais sensíveis para servidores externos.
+* **RNF03 — Segurança e Privacidade (LGPD):** O sistema deve armazenar os dados no Firebase Cloud Firestore, com cache local para uso offline, identificando a pessoa apenas por login anônimo (sem e-mail, telefone ou senha) e coletando somente nome e idade como dados pessoais. As regras de segurança devem permitir que cada usuário acesse exclusivamente os próprios dados. Os registros do Diário de Humor (incluindo o desabafo privado) são visíveis somente ao próprio usuário e não devem constar no relatório em PDF compartilhado com os responsáveis.
 * **RNF04 — Conectividade (Offline-First):** O aplicativo deve manter pleno funcionamento de suas funções principais em modo offline, restringindo a sincronização de estatísticas pesadas estritamente a conexões Wi-Fi.
 * **RNF05 — Compatibilidade:** O sistema deve ser compatível com dispositivos executando o sistema operacional Android 8.0 (API nível 26) ou superior.
 * **RNF06 — Acessibilidade e Interface:** O aplicativo deve oferecer interface nativa em modo escuro (Dark Mode) com taxa de contraste mínima de 4.5:1 para visualização confortável em ambientes de pouca luz.

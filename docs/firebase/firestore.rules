@@ -1,0 +1,151 @@
+rules_version = '2';
+
+// AntiTela - Regras de seguranca do Firestore
+//
+// Principios:
+//  - Cada adolescente so enxerga e altera os PROPRIOS dados (uid anonimo).
+//  - A matriz CRUD do requisitos.md (secao 2.4) e aplicada aqui:
+//      missoes_offline  -> criar, ler, atualizar, excluir
+//      registros_diario -> criar, ler, excluir     (sem atualizar)
+//      sessoes_foco     -> criar, ler, excluir     (sem atualizar)
+//      avatar           -> criar, ler, atualizar   (sem excluir, exceto ao apagar a conta)
+//  - tags_contexto e uma tabela de referencia: leitura apenas.
+//  - Qualquer caminho nao listado aqui e negado por padrao.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    function dono(uid) {
+      return logado() && request.auth.uid == uid;
+    }
+
+    function texto(valor, max) {
+      return valor is string && valor.size() > 0 && valor.size() <= max;
+    }
+
+    function inteiro(valor, min, max) {
+      return valor is int && valor >= min && valor <= max;
+    }
+
+    // ------------------------------------------------------------------
+    // usuarios/{uid}  -> so nome e idade (sem e-mail, telefone ou senha)
+    // ------------------------------------------------------------------
+    match /usuarios/{uid} {
+
+      function perfilValido() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['nome', 'idade', 'tipo', 'criado_em'])
+          && d.keys().hasAll(['nome', 'idade', 'tipo', 'criado_em'])
+          && texto(d.nome, 30)
+          && inteiro(d.idade, 12, 18)          // manter igual a Usuario.idadeMinima/Maxima
+          && d.tipo == 'adolescente'
+          && d.criado_em is timestamp;
+      }
+
+      allow read: if dono(uid);
+      allow create: if dono(uid) && perfilValido()
+                    && request.resource.data.criado_em == request.time;
+      allow update: if dono(uid) && perfilValido()
+                    && request.resource.data.criado_em == resource.data.criado_em;
+      allow delete: if dono(uid);
+
+      // ----------------------------------------------------------------
+      // usuarios/{uid}/avatar/atual   (1 avatar por usuario)
+      // ----------------------------------------------------------------
+      match /avatar/{id} {
+
+        function avatarValido() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['nome_mascote', 'status_humor', 'dias_protegidos', 'escudos'])
+            && d.keys().hasAll(['nome_mascote', 'status_humor', 'dias_protegidos', 'escudos'])
+            && texto(d.nome_mascote, 30)
+            && d.status_humor in ['saudavel', 'cansado', 'esgotado']
+            && inteiro(d.dias_protegidos, 0, 100000)
+            && inteiro(d.escudos, 0, 100000);
+        }
+
+        allow read: if dono(uid);
+        allow create: if dono(uid) && id == 'atual' && avatarValido();
+        allow update: if dono(uid) && avatarValido();
+        // Avatar e fixo: so pode ser removido junto com o proprio usuario (apagar todos os dados).
+        allow delete: if dono(uid)
+                      && !existsAfter(/databases/$(database)/documents/usuarios/$(uid));
+      }
+
+      // ----------------------------------------------------------------
+      // usuarios/{uid}/sessoes_foco/{id}   (imutavel depois de criada)
+      // ----------------------------------------------------------------
+      match /sessoes_foco/{id} {
+
+        function sessaoValida() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['duracao_minutos', 'tipo_ciclo', 'horario_inicio', 'concluida'])
+            && d.keys().hasAll(['duracao_minutos', 'tipo_ciclo', 'horario_inicio', 'concluida'])
+            && inteiro(d.duracao_minutos, 1, 240)
+            && d.tipo_ciclo in ['pomodoro', 'profundo', 'noturno']
+            && d.horario_inicio is timestamp
+            && d.concluida is bool;
+        }
+
+        allow read: if dono(uid);
+        allow create: if dono(uid) && sessaoValida();
+        allow update: if false;
+        allow delete: if dono(uid);
+      }
+
+      // ----------------------------------------------------------------
+      // usuarios/{uid}/missoes_offline/{id}   (CRUD completo)
+      // ----------------------------------------------------------------
+      match /missoes_offline/{id} {
+
+        function missaoValida() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['titulo', 'recompensa_bonus', 'concluida'])
+            && d.keys().hasAll(['titulo', 'recompensa_bonus', 'concluida'])
+            && texto(d.titulo, 80)
+            && inteiro(d.recompensa_bonus, 0, 1000)
+            && d.concluida is bool;
+        }
+
+        allow read: if dono(uid);
+        allow create: if dono(uid) && missaoValida();
+        allow update: if dono(uid) && missaoValida();
+        allow delete: if dono(uid);
+      }
+
+      // ----------------------------------------------------------------
+      // usuarios/{uid}/registros_diario/{id}   (imutavel; tags = N:N embutido)
+      // ----------------------------------------------------------------
+      match /registros_diario/{id} {
+
+        function registroValido() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['timestamp', 'bateria_mental', 'desabafo_privado', 'tags'])
+            && d.keys().hasAll(['timestamp', 'bateria_mental', 'tags'])
+            && d.timestamp is timestamp
+            && d.bateria_mental in ['suave', 'cansado', 'frito']
+            && d.get('desabafo_privado', '') is string
+            && d.get('desabafo_privado', '').size() <= 2000
+            && d.tags is list
+            && d.tags.size() <= 10;
+        }
+
+        allow read: if dono(uid);
+        allow create: if dono(uid) && registroValido();
+        allow update: if false;
+        allow delete: if dono(uid);
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // tags_contexto/{id}  -> tabela de referencia (populada via seed_tags.js)
+    // ------------------------------------------------------------------
+    match /tags_contexto/{id} {
+      allow read: if logado();
+      allow write: if false;
+    }
+  }
+}

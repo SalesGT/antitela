@@ -11,6 +11,11 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.2.2
   google_fonts: ^6.1.0
+  firebase_core: ^4.14.0
+  firebase_auth: ^6.6.1
+  cloud_firestore: ^6.9.0
+  pdf: ^3.11.0
+  printing: ^5.13.0
 
 dev_dependencies:
   flutter_test:

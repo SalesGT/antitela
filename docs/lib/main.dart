@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'app_gate.dart';
 import 'screens/ancora_screen.dart';
 import 'screens/foco_screen.dart';
 import 'screens/missoes_screen.dart';
 import 'screens/diario_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    // Sem Firebase configurado o app abre, mas a tela de boas-vindas avisa que nao salvou.
+    debugPrint('Firebase nao inicializado: $e');
+  }
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
@@ -30,7 +39,7 @@ class AntiTelaApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.bg,
         fontFamily: 'Roboto',
       ),
-      home: const HomeShell(),
+      home: const AppGate(),
     );
   }
 }

@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../main.dart';
+import '../data/antitela_repository.dart';
+import '../models/registro_diario.dart';
 
 enum Mood { suave, cansado, frito }
 
@@ -41,26 +44,73 @@ class _DiarioScreenState extends State<DiarioScreen> {
     '#FOMO'
   ];
 
-  final List<_DiaryEntry> _entries = [
-    _DiaryEntry(time: '16:45', mood: Mood.frito, tags: ['#TikTok', '#Tédio']),
-    _DiaryEntry(time: '11:20', mood: Mood.suave, tags: ['#Estudos']),
-  ];
+  // Ids das tags no banco (coleção tags_contexto) para cada rótulo da tela.
+  static const Map<String, String> _tagIds = {
+    '#TikTok': 'tiktok',
+    '#Jogos': 'jogos',
+    '#Tédio': 'tedio',
+    '#Ansiedade': 'ansiedade',
+    '#Estudos': 'estudos',
+    '#Série': 'serie',
+    '#FOMO': 'fomo',
+  };
 
-  void _register() {
-    final now = TimeOfDay.now();
-    final timeStr =
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+  final AntiTelaRepository _repo = AntiTelaRepository();
+  final List<_DiaryEntry> _entries = [];
+  StreamSubscription<List<RegistroDiario>>? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _sub = _repo.diario().listen((lista) {
+        if (!mounted) return;
+        final abertos = {for (final e in _entries) if (e.expanded) e.id};
+        final rotulos = {for (final e in _tagIds.entries) e.value: e.key};
+        setState(() {
+          _entries
+            ..clear()
+            ..addAll(lista.map((r) => _DiaryEntry(
+                  id: r.id,
+                  time: _formatarHora(r.timestamp),
+                  mood: Mood.values.firstWhere((m) => m.name == r.bateriaMental,
+                      orElse: () => Mood.suave),
+                  tags: r.tags.map((id) => rotulos[id] ?? '#$id').toList(),
+                  note: r.desabafoPrivado,
+                )..expanded = abertos.contains(r.id)));
+        });
+      }, onError: (Object e) => debugPrint('Erro ao ler diário: $e'));
+    } catch (e) {
+      debugPrint('Banco indisponível: $e');
+    }
+  }
+
+  String _formatarHora(DateTime d) {
+    String dois(int n) => n.toString().padLeft(2, '0');
+    final hoje = DateTime.now();
+    final hora = '${dois(d.hour)}:${dois(d.minute)}';
+    final ehHoje =
+        d.year == hoje.year && d.month == hoje.month && d.day == hoje.day;
+    return ehHoje ? hora : '${dois(d.day)}/${dois(d.month)} $hora';
+  }
+
+  Future<void> _apagar(_DiaryEntry e) async {
+    final id = e.id;
+    if (id == null) return;
+    try {
+      await _repo.apagarRegistroDiario(id);
+    } catch (err) {
+      debugPrint('Erro ao apagar registro: $err');
+    }
+  }
+
+  Future<void> _register() async {
+    final nota = _noteController.text.trim();
+    final mood = _mood;
+    final tagIds =
+        _selectedTags.map((t) => _tagIds[t]).whereType<String>().toList();
+    final messenger = ScaffoldMessenger.of(context);
     setState(() {
-      _entries.insert(
-          0,
-          _DiaryEntry(
-            time: timeStr,
-            mood: _mood,
-            tags: List.from(_selectedTags),
-            note: _noteController.text.trim().isEmpty
-                ? null
-                : _noteController.text.trim(),
-          ));
       _selectedTags.clear();
       _noteController.clear();
       _saved = true;
@@ -68,10 +118,22 @@ class _DiarioScreenState extends State<DiarioScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _saved = false);
     });
+    try {
+      await _repo.registrarDiario(
+        bateriaMental: mood.name,
+        desabafoPrivado: nota.isEmpty ? null : nota,
+        tagIds: tagIds,
+      );
+    } catch (e) {
+      debugPrint('Erro ao salvar diário: $e');
+      messenger.showSnackBar(const SnackBar(
+          content: Text('Não foi possível salvar o registro.')));
+    }
   }
 
   @override
   void dispose() {
+    _sub?.cancel();
     _noteController.dispose();
     super.dispose();
   }
@@ -148,7 +210,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
             SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Privacidade 100% garantida: reflexões confidenciais e seguras.',
+                'Só você vê o seu diário: ele não entra no relatório em PDF dos seus pais.',
                 style: TextStyle(color: AppColors.textMuted, fontSize: 12),
               ),
             ),
@@ -420,7 +482,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
           const SizedBox(height: 10),
           ..._entries.map((e) => _EntryTile(
                 entry: e,
-                onDelete: () => setState(() => _entries.remove(e)),
+                onDelete: () => _apagar(e),
               )),
         ],
       ),
@@ -446,6 +508,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
 }
 
 class _DiaryEntry {
+  final String? id;
   final String time;
   final Mood mood;
   final List<String> tags;
@@ -453,7 +516,11 @@ class _DiaryEntry {
   bool expanded = false;
 
   _DiaryEntry(
-      {required this.time, required this.mood, required this.tags, this.note});
+      {this.id,
+      required this.time,
+      required this.mood,
+      required this.tags,
+      this.note});
 }
 
 class _EntryTile extends StatefulWidget {

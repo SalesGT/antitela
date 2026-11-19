@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../main.dart';
+import '../data/antitela_repository.dart';
+import '../models/sessao_foco.dart';
 
 class FocoScreen extends StatefulWidget {
   const FocoScreen({super.key});
@@ -14,12 +16,40 @@ class _FocoScreenState extends State<FocoScreen> {
   bool _running = false;
   int _elapsed = 0;
   Timer? _timer;
+  final AntiTelaRepository _repo = AntiTelaRepository();
+  DateTime? _inicio;
 
   int get _totalSeconds => _sessionMins * 60;
   int get _secondsLeft => _totalSeconds - _elapsed;
   double get _progress => _totalSeconds > 0 ? _elapsed / _totalSeconds : 0;
 
+  String _cicloDe(int mins) {
+    if (mins >= 60) return SessaoFoco.cicloNoturno;
+    if (mins >= 45) return SessaoFoco.cicloProfundo;
+    return SessaoFoco.cicloPomodoro;
+  }
+
+  // Grava a sessão quando ela TERMINA (concluída ou desistida), pois sessões são imutáveis.
+  Future<void> _registrar({required bool concluida}) async {
+    final inicio = _inicio;
+    if (inicio == null) return;
+    _inicio = null;
+    final minutos = concluida ? _sessionMins : _elapsed ~/ 60;
+    if (minutos < 1) return; // ignora desistência em menos de 1 minuto
+    try {
+      await _repo.registrarSessao(
+        duracaoMinutos: minutos,
+        tipoCiclo: _cicloDe(_sessionMins),
+        horarioInicio: inicio,
+        concluida: concluida,
+      );
+    } catch (e) {
+      debugPrint('Erro ao salvar sessão: $e');
+    }
+  }
+
   void _start() {
+    _inicio = DateTime.now();
     setState(() {
       _running = true;
       _elapsed = 0;
@@ -30,6 +60,7 @@ class _FocoScreenState extends State<FocoScreen> {
           _elapsed = _totalSeconds;
           _running = false;
           _timer?.cancel();
+          _registrar(concluida: true);
         } else {
           _elapsed++;
         }
@@ -38,6 +69,7 @@ class _FocoScreenState extends State<FocoScreen> {
   }
 
   void _stop() {
+    _registrar(concluida: false);
     _timer?.cancel();
     setState(() => _running = false);
   }

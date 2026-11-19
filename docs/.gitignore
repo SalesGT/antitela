@@ -46,3 +46,8 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Firebase: chaves de servico e dependencias do script de seed (NUNCA enviar ao GitHub)
+*firebase-adminsdk*.json
+serviceAccount*.json
+firebase/node_modules/
