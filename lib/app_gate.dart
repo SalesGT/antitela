@@ -31,8 +31,13 @@ class _AppGateState extends State<AppGate> {
         }
         if (snapshot.data == true) return const HomeShell();
         return BoasVindasScreen(
-          onConcluido: () => setState(() => _temPerfil = Future.value(true)),
-        );
+          onConcluido: () {
+            setState(() {
+              _temPerfil = Future.value(true);
+            });
+          },        
+          
+          );
       },
     );
   }

@@ -24,3 +24,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+# Evita erro de compilacao 'decodeLazy isn't defined for ZLibDecoder':
+# image 4.11.x exige um archive mais novo do que o Flutter 3.35 consegue resolver.
+dependency_overrides:
+  image: 4.5.4
